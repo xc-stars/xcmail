@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "electron": "^1.4.4"
+    "electron": "^1.4.4",
+    "standard": "*"
   }
 }
