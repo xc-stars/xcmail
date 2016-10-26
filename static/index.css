@@ -1,0 +1,26 @@
+html,body,#mailspace{
+  margin: 0;
+  height: 100%;
+}
+
+#mailspace{
+  position: relative;
+}
+
+#mailfolder{
+  width: 10%;
+  height: 100%;
+  background-color: blue;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#mailbox{
+  width: 90%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  overflow: auto;
+}
