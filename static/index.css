@@ -17,7 +17,7 @@ html,body,#mailspace{
 }
 
 #mailbox{
-  width: 90%;
+  width: 50%;
   height: 100%;
   position: absolute;
   right: 0;

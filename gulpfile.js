@@ -2,6 +2,11 @@ var gulp=require('gulp');
 var less=require('gulp-less');
 var lessSrc='static/less/**/*.less';
 var lessDist="static/css";
+var jsSrc;
+var jsDist;
+
+
+
 gulp.watch(lessSrc,['compile-less'])	
 gulp.task('default',['compile-less'])
 gulp.task('compile-less',function(){
