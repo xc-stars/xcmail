@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>xxcmail</title>
+  </head>
+  <body>
+    <input type="text" id='username'/>
+    <input type="text" id='password'/>
+    <input type="button" value="登录" id='loginBtn'>
+	<script>
+		const ipcRenderer = require('electron').ipcRenderer;
+		var loginBtn=document.querySelector('#loginBtn');
+		loginBtn.onclick=function(){
+			var account={
+				username:document.querySelector('#username').value,
+				password:document.querySelector('#password').value,
+				host:'imap.qq.com'
+			}
+
+			ipcRenderer.send('login',account);
+			ipcRenderer.on('login',function(event,err,user){
+				if(err)console.log('登录失败')
+					else console.log('登录成功')
+				console.log(err)
+				console.log(user)
+			});
+
+		}
+
+
+	</script>
+
+
+  </body>
+</html>

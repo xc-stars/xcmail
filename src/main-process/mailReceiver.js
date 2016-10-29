@@ -17,26 +17,31 @@ function MailReceiver(account) {
 	  tls: this.ssl
 	});
 	
-	this.imap.on('error', function (err) {
-	  console.log(err)
-	  console.log(111111)
-	})
+	
 
 	this.imap.on('end', function () {
 	  console.log('Connection ended')
 	})
-	this.imap.on('ready',function(){
-		console.log('链接成功');
-	})
+	// this.imap.on('ready',function(){
+	// 	console.log('链接成功');
+	// })
 }
 //login
-MailReceiver.prototype.login=function(fn){
-	this.imap.once('ready', function () {
-		console.log("连接成功")
-		fn();
+MailReceiver.login=function(account,fn){
+
+	var receiver=new MailReceiver({username:account.username,password:account.password,host:account.host,port:account.port,ssl:account.ssl})
+	receiver.imap.once('error', function (err) {
+		console.log(err)
+	  fn(err,receiver);
 	})
-	this.imap.connect();
+	receiver.imap.once('ready', function () {
+		console.log("连接成功")
+		fn(null,receiver);
+	})
+	receiver.imap.connect();
 }
+
+
 //获取所有的miall的To,SUBJECT DATA
 MailReceiver.prototype.getAllMails=function(fn){
 	var that=this;
