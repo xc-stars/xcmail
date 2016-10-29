@@ -37,25 +37,36 @@ MailReceiver.prototype.login=function(fn){
 	})
 	this.imap.connect();
 }
-//获取所有的miall
+//获取所有的miall的To,SUBJECT DATA
 MailReceiver.prototype.getAllMails=function(fn){
 	var that=this;
 	that.openInbox(function(err, box) {
 		if (err) throw err;
-		var f = that.imap.seq.fetch('1:3', {
-			bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
+		var f = that.imap.seq.fetch('1:*', {
+			bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'],
 			struct: true
 		});
 		f.on('message', function(msg, seqno) {
 			console.log('Message #%d', seqno);
 			var prefix = '(#' + seqno + ') ';
+
 			msg.on('body', function(stream, info) {
+				console.log('----------------------------------------------')
+				console.dir(info)
+				console.log('----------------------------------------------')
 				var buffer = '';
 				stream.on('data', function(chunk) {
 					buffer += chunk.toString('utf8');
 				});
 				stream.once('end', function() {
+					console.log('end--------------------------------------'+info.which)
 					console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+
+					if (info.which === 'TEXT')
+						fn(buffer)
+					else
+						fn(Imap.parseHeader(buffer))
+
 				});
 			});
 			msg.once('attributes', function(attrs) {
@@ -73,7 +84,6 @@ MailReceiver.prototype.getAllMails=function(fn){
 			// imap.end();
 		});
 	});
-
 }
 
 //search
