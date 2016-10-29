@@ -31,6 +31,7 @@ exports.init=function(){
 	initMemoryCache();
 	initDiskCache();
 }
+//初始化
 exports.init();
 //先从内存中找。然后从硬盘中找
 //从硬盘中找到后再放到内存缓存中
