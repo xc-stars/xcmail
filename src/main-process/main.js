@@ -1,31 +1,41 @@
-const {app, BrowserWindow,ipcMain } = require('electron')
-var MailReceiver = require('./mailReceiver');
+const {app, BrowserWindow, ipcMain } = require('electron')
+var MailReceiver = require('./mailReceiver')
+var utils= require('./utils')
 let win = null
-//用户列表
-var users={};
+// 用户(邮件接收器)列表
+var receivers = {}
 
 function start () {
   win = new BrowserWindow({width: 800, height: 700})
   win.loadURL(`file://${__dirname}/../static/index.html`)
 }
-
-ipcMain.on('login',function(event,account){
-
-	MailReceiver.login(account,function(err,user){
-		event.sender.send('login',err,user)
-		if(!err){
-			users[1]=user;
-		}
-	})
-	
+//获取现在已经成功登录的用户
+//只需要返回用户名
+ipcMain.on('getUserList', (event, account) => {
+  var key;
+  var usersTemp=[];
+  for(key in receivers){
+    usersTemp.push(receivers[key].username)
+  }
+  event.sender.send('getUserList', usersTemp);
 })
-ipcMain.on('getAllEmails',function(event,txt){
-	receiver.getAllMails(function(txt){
-		event.sender.send('getAllEmails',txt)
-	})	
-	
+
+//登录接口
+ipcMain.on('login', (event, account) => {
+  MailReceiver.login(account, (err, receiver) => {
+    event.sender.send('login', err, receiver)
+    if (!err) {
+      console.log(receiver.username)
+      console.log(utils.md5(receiver.username))
+      receivers[utils.md5(receiver.username)] = receiver
+    }
+  })
+})
+ipcMain.on('getAllEmails', (event, txt) => {
+  receiver.getAllMails((txt) => {
+    event.sender.send('getAllEmails', txt)
+  })
 })
 
 app.on('ready', start)
-
 

@@ -2,8 +2,8 @@ var gulp = require('gulp')
 var less = require('gulp-less')
 var lessSrc = 'src/static/less/**/*.less'
 var lessDist = 'src/static/css'
-var jsSrc
-var jsDist
+// var jsSrc = ''
+// var jsDist = ''
 
 gulp.watch(lessSrc, ['compile-less'])
 gulp.task('default', ['compile-less'])

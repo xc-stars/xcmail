@@ -19,7 +19,7 @@ function MailReceiver(account) {
 
 
 
-	this.imap.on('end', function () {
+	this.imap.on('end',() => {
 	  console.log('Connection ended')
 	})
 	// this.imap.on('ready',function(){
@@ -30,11 +30,11 @@ function MailReceiver(account) {
 MailReceiver.login=function(account,fn){
 
 	var receiver=new MailReceiver({username:account.username,password:account.password,host:account.host,port:account.port,ssl:account.ssl})
-	receiver.imap.once('error', function (err) {
+	receiver.imap.once('error', (err)=> {
 		console.log(err)
 	  fn(err,receiver);
 	})
-	receiver.imap.once('ready', function () {
+	receiver.imap.once('ready',  ()=> {
 		console.log("连接成功")
 		fn(null,receiver);
 	})
@@ -45,27 +45,27 @@ MailReceiver.login=function(account,fn){
 //获取所有的miall的To,SUBJECT DATA
 MailReceiver.prototype.getAllMails=function(fn){
 	var that=this;
-	that.openInbox(function(err, box) {
+	that.openInbox((err, box) => {
 		if (err) throw err;
-		var f = that.imap.seq.fetch('1:2', {
+		var f = that.imap.seq.fetch('1:5', {
 			markSeen :true,
 			size:true,
 			// bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'],
 			struct: true
 		});
-		f.on('message', function(msg, seqno) {
+		f.on('message', (msg, seqno) => {
 			console.log('Message #%d', seqno);
 			var prefix = '(#' + seqno + ') ';
 
-			msg.on('body', function(stream, info) {
+			msg.on('body', (stream, info) => {
 				console.log('----------------------------------------------')
 				console.dir(info)
 				console.log('----------------------------------------------')
 				var buffer = '';
-				stream.on('data', function(chunk) {
+				stream.on('data', (chunk) =>{
 					buffer += chunk.toString('utf8');
 				});
-				stream.once('end', function() {
+				stream.once('end', () =>{
 					console.log('end--------------------------------------'+info.which)
 					console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
 
@@ -76,17 +76,17 @@ MailReceiver.prototype.getAllMails=function(fn){
 
 				});
 			});
-			msg.once('attributes', function(attrs) {
+			msg.once('attributes', (attrs) =>{
 				console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
 			});
-			msg.once('end', function() {
+			msg.once('end', () =>{
 				console.log(prefix + 'Finished');
 			});
 		});
-		f.once('error', function(err) {
+		f.once('error', (err)=>{
 			console.log('Fetch error: ' + err);
 		});
-		f.once('end', function() {
+		f.once('end', () =>{
 			console.log('Done fetching all messages!');
 			// imap.end();
 		});
@@ -94,15 +94,16 @@ MailReceiver.prototype.getAllMails=function(fn){
 }
 
 //search
-MailReceiver.prototype.search=function(search){
+MailReceiver.prototype.search=function(search) {
 	var that=this;
 	that.openInbox((err, box) => {
 		if (err) throw err;
-		that.imap.search([ 'NEW',['ON', 'April 20, 2010']], function(err, results) {
+		that.imap.search([ "ALL"], (err, results)=> {
 			console.log(results)
 			console.log(results.length)
 		})
 	});
+}
 // 得到所有的文件夹
 MailReceiver.prototype.getAllBoxs = function (fn) {
 	this.imap.getBoxes('', (err, boxes) => {
@@ -114,5 +115,4 @@ MailReceiver.prototype.getAllBoxs = function (fn) {
 MailReceiver.prototype.openInbox=function(cb) {
   this.imap.openBox('INBOX', true, cb);
 }
-
 module.exports = MailReceiver;
