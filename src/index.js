@@ -1,12 +1,11 @@
-
-(function () {
-  const imap = require('../src/imap-client')
+;(function () {
+  const imap = require('./imap-client')
   const fs = require('fs')
-  var filedir = "static/emails/"
-  var str = ""
-  var mailDivDom = document.createElement("div")
+  var filedir = 'static/emails/'
+  var str = ''
+  var mailDivDom = document.createElement('div')
   var files = fs.readdirSync(filedir)
-  function connectToServer(){
-    imap.connect();
+  function connectToServer () {
+    imap.connect()
   }
 }())

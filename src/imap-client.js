@@ -7,7 +7,7 @@ const Promise = require('promise')
 
 let imap = new Imap({
   user: '779427354@qq.com',
-  password: 'patrick1234',
+  password: '******',
   host: 'imap.qq.com',
   port: 993,
   tls: true
