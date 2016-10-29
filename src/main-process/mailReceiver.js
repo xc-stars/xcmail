@@ -26,7 +26,7 @@ function MailReceiver (account) {
 }
 // login
 MailReceiver.login = function (account, fn) {
-  var receiver = new MailReceiver({username: account.username,password: account.password,host: account.host,port: account.port,ssl: account.ssl})
+  var receiver = new MailReceiver({username: account.username, password: account.password, host: account.host, port: account.port, ssl: account.ssl})
   receiver.imap.once('error', function (err) {
     console.log(err)
     fn(err, receiver)
@@ -64,7 +64,6 @@ MailReceiver.prototype.getAllMails = function (fn) {
         stream.once('end', function () {
           console.log('end--------------------------------------' + info.which)
           console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)))
-
 
           // if (info.which === 'TEXT')
           // 	fn(buffer)
@@ -116,16 +115,17 @@ MailReceiver.prototype.search = function (search) {
   })
 }
 
-//search
-MailReceiver.prototype.search=function(search){
-	var that=this;
-	that.openInbox((err, box) => {
-		if (err) throw err;
-		that.imap.search([ 'NEW',['ON', 'April 20, 2010']], function(err, results) {
-			console.log(results)
-			console.log(results.length)
-		})
-	});
+// search
+MailReceiver.prototype.search = function (search) {
+  var that = this
+  that.openInbox((err, box) => {
+    if (err) throw err
+    that.imap.search([ 'NEW', ['ON', 'April 20, 2010']], function (err, results) {
+      console.log(results)
+      console.log(results.length)
+    })
+  })
+}
 // 得到所有的文件夹
 MailReceiver.prototype.getAllBoxes = function (fn) {
   this.imap.getBoxes('', (err, boxes) => {
