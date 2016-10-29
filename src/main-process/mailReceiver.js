@@ -16,8 +16,8 @@ function MailReceiver(account) {
 	  port: this.port,
 	  tls: this.ssl
 	});
-	
-	
+
+
 
 	this.imap.on('end', function () {
 	  console.log('Connection ended')
@@ -96,14 +96,20 @@ MailReceiver.prototype.getAllMails=function(fn){
 //search
 MailReceiver.prototype.search=function(search){
 	var that=this;
-	that.openInbox(function(err, box) {
+	that.openInbox((err, box) => {
 		if (err) throw err;
 		that.imap.search([ 'NEW',['ON', 'April 20, 2010']], function(err, results) {
 			console.log(results)
 			console.log(results.length)
 		})
 	});
+// 得到所有的文件夹
+MailReceiver.prototype.getAllBoxs = function (fn) {
+	this.imap.getBoxes('', (err, boxes) => {
+		fn(boxes)
+	})
 }
+
 //login
 MailReceiver.prototype.openInbox=function(cb) {
   this.imap.openBox('INBOX', true, cb);
