@@ -1,0 +1,62 @@
+*{
+  margin:0;
+  padding:0;
+}
+html,body,#mailspace{
+  margin: 0;
+  height: 100%;
+}
+
+#mailspace{
+  position: relative;
+}
+@item-height:25px;
+#mailfolder{
+  width: 10%;
+  height: 100%;
+  background-color: blue;
+  position: absolute;
+  left: 0;
+  top: 0;
+  ul{
+    li{
+      list-style: none;
+      display: block;
+      width:100%;
+      height:@item-height;
+      line-height: @item-height;
+      text-align: center;
+      cursor:pointer;
+      border-bottom:#000 1px solid;
+      &:hover{
+        background: #333;
+      }
+    }
+  }
+}
+
+@mail-item-height:30px;
+#mailbox{
+  background: #333;
+  width: 90%;
+  height: 100%;
+  position: absolute;
+  right: 0;
+  top: 0;
+  overflow: auto;
+
+
+  ul{
+    li{
+      list-style: none;
+      display: block;
+      border-bottom: #000000 1px solid;
+      height:@mail-item-height;
+      line-height:@mail-item-height;
+      cursor:pointer;
+      &:hover{
+        background:#444;
+      }
+    }
+  }
+}

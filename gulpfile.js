@@ -1,6 +1,6 @@
 var gulp = require('gulp')
 var less = require('gulp-less')
-var lessSrc = 'src/static/less/*.less'
+var lessSrc = 'src/static/less/**/*.less'
 var lessDist = 'src/static/css'
 var jsSrc
 var jsDist
