@@ -19,7 +19,7 @@
 			}
 
 			ipcRenderer.send('login',account);
-			ipcRenderer.on('login',function(event,err,user){
+			ipcRenderer.once('login',function(event,err,user){
 				if(err)console.log('登录失败')
 					else console.log('登录成功')
 				console.log(err)
