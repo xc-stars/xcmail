@@ -65,6 +65,7 @@ MailReceiver.prototype.getAllMails = function (fn) {
           console.log('end--------------------------------------' + info.which)
           console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)))
 
+
           // if (info.which === 'TEXT')
           // 	fn(buffer)
           // else
@@ -115,6 +116,16 @@ MailReceiver.prototype.search = function (search) {
   })
 }
 
+//search
+MailReceiver.prototype.search=function(search){
+	var that=this;
+	that.openInbox((err, box) => {
+		if (err) throw err;
+		that.imap.search([ 'NEW',['ON', 'April 20, 2010']], function(err, results) {
+			console.log(results)
+			console.log(results.length)
+		})
+	});
 // 得到所有的文件夹
 MailReceiver.prototype.getAllBoxes = function (fn) {
   this.imap.getBoxes('', (err, boxes) => {
