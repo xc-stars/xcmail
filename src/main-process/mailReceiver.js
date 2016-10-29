@@ -47,8 +47,10 @@ MailReceiver.prototype.getAllMails=function(fn){
 	var that=this;
 	that.openInbox(function(err, box) {
 		if (err) throw err;
-		var f = that.imap.seq.fetch('1:*', {
-			bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'],
+		var f = that.imap.seq.fetch('1:2', {
+			markSeen :true,
+			size:true,
+			// bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'],
 			struct: true
 		});
 		f.on('message', function(msg, seqno) {
@@ -67,9 +69,9 @@ MailReceiver.prototype.getAllMails=function(fn){
 					console.log('end--------------------------------------'+info.which)
 					console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
 
-					if (info.which === 'TEXT')
-						fn(buffer)
-					else
+					// if (info.which === 'TEXT')
+					// 	fn(buffer)
+					// else
 						fn(Imap.parseHeader(buffer))
 
 				});
@@ -93,7 +95,14 @@ MailReceiver.prototype.getAllMails=function(fn){
 
 //search
 MailReceiver.prototype.search=function(search){
-	
+	var that=this;
+	that.openInbox(function(err, box) {
+		if (err) throw err;
+		that.imap.search([ 'NEW',['ON', 'April 20, 2010']], function(err, results) {
+			console.log(results)
+			console.log(results.length)
+		})
+	});
 }
 //login
 MailReceiver.prototype.openInbox=function(cb) {
