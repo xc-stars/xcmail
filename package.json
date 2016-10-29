@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "imap": "^0.8.17",
+    "lru-cache": "^4.0.1",
     "mailparser": "^0.6.1",
     "promise": "^7.1.1"
   },

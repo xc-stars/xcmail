@@ -31,8 +31,8 @@ ipcMain.on('login', (event, account) => {
     }
   })
 })
-ipcMain.on('getAllEmails', (event, txt) => {
-  receiver.getAllMails((txt) => {
+ipcMain.on('getAllEmails', (event, username) => {
+  receivers[utils.md5(username)].getAllMails((txt) => {
     event.sender.send('getAllEmails', txt)
   })
 })
