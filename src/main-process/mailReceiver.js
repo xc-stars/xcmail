@@ -43,8 +43,10 @@ MailReceiver.prototype.getAllMails = function (fn) {
   var that = this
   that.openInbox(function (err, box) {
     if (err) throw err
-    var f = that.imap.seq.fetch('1:*', {
-      bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'],
+    var f = that.imap.seq.fetch('1:2', {
+      markSeen: true,
+      size: true,
+      // bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'],
       struct: true
     })
     f.on('message', function (msg, seqno) {
@@ -63,10 +65,10 @@ MailReceiver.prototype.getAllMails = function (fn) {
           console.log('end--------------------------------------' + info.which)
           console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)))
 
-          if (info.which === 'TEXT')
-            fn(buffer)
-          else
-            fn(Imap.parseHeader(buffer))
+          // if (info.which === 'TEXT')
+          // 	fn(buffer)
+          // else
+          fn(Imap.parseHeader(buffer))
         })
       })
       msg.once('attributes', function (attrs) {
@@ -94,9 +96,21 @@ MailReceiver.prototype.markMailSeen = function (seqno) {
       throw err
     }
     that.imap.seq.setFlags(seqno, ['Seen'], (err) => {
-			if (err) {
-				throw err
-			}
+      if (err) {
+        throw err
+      }
+    })
+  })
+}
+
+// search
+MailReceiver.prototype.search = function (search) {
+  var that = this
+  that.openInbox((err, box) => {
+    if (err) throw err
+    that.imap.search([ 'NEW', ['ON', 'April 20, 2010']], function (err, results) {
+      console.log(results)
+      console.log(results.length)
     })
   })
 }
@@ -104,9 +118,9 @@ MailReceiver.prototype.markMailSeen = function (seqno) {
 // 得到所有的文件夹
 MailReceiver.prototype.getAllBoxes = function (fn) {
   this.imap.getBoxes('', (err, boxes) => {
-		if (err) {
-			throw err
-		}
+    if (err) {
+      throw err
+    }
     fn(boxes)
   })
 }
