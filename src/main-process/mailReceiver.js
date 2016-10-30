@@ -45,26 +45,32 @@ MailReceiver.login = function (account, fn) {
 MailReceiver.prototype.getMailsHeader = function (boxname, fn) {
   var that = this
   var headers = []
+
   that.openBox(boxname, (err, box) => {
     if (err) throw err
-    var f = that.imap.fetch(box.messages.total + ':*', {
+    	 var f = that.imap.fetch('1:*', {
       bodies: ['HEADER.FIELDS (FROM SUBJECT DATE)'],
       struct: true
     })
-
     f.on('message', (msg, seqno) => {
       var obj = {}
+      console.log(seqno)
       msg.on('body', (stream, info) => {
-        var mailparser = new MailParser()
-        stream.pipe(mailparser)
-        mailparser.on('headers', (header) => {
-          obj.header = header
-        })
+    	
+				var buffer = '';
+				stream.on('data', function(chunk) {
+				  buffer += chunk.toString('utf8');
+				});
+				stream.once('end', function() {
+					var header=Imap.parseHeader(buffer)
+				  // console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+				  obj.header = header
+				});
       })
-      msg.on('attributes', (attributes) => {
+      msg.once('attributes', (attributes) => {
         obj.attributes = attributes
       })
-      msg.on('end', () => {
+      msg.once('end', () => {
         headers.push(obj)
       })
     })
