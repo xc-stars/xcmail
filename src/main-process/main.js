@@ -23,7 +23,7 @@ ipcMain.on('getUserList', (event, account) => {
 // 登录接口
 ipcMain.on('login', (event, account) => {
   MailReceiver.login(account, (err, receiver) => {
-    event.sender.send('login', err, receiver)
+    event.sender.send('login', err)
     if (!err) {
       console.log(receiver.username)
       console.log(utils.md5(receiver.username))
@@ -35,6 +35,17 @@ ipcMain.on('getAllEmails', (event, username) => {
   receivers[utils.md5(username)].getAllMails((txt) => {
     event.sender.send('getAllEmails', txt)
   })
+})
+
+ipcMain.on('testMail', (event) => {
+  MailReceiver.login({username:'lovecodeq@foxmail.com',password:'jtnoxtpestzcbheb',host:'imap.qq.com',port:993,ssl:true},function(err,receiver){
+  // console.log(err,receiver)
+    receiver.getMail('85',false,function(txt){
+       event.sender.send('testMail', txt)
+    })
+  })
+
+  
 })
 
 app.on('ready', start)
