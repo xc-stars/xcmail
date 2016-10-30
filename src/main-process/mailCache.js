@@ -3,8 +3,8 @@ var DiskCache=require('./diskCache')
 var utils=require('./utils')
 var path=require('path')
 var Constant=require('./Constant')
-var memoryCacheOptions = { max: 5000
-              , length: function (value, key) { return value * 2 + key.length }
+var memoryCacheOptions = { max: Constant.MEMORY_CACHE_SIZE
+              , length: function (value, key) { return value.length + key.length }
               , dispose: function (key, value) { console.log('disponse '+key+" "+value) }
               , maxAge: 1000 * 60 * 60 };
 
