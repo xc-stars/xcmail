@@ -1,5 +1,6 @@
-var Imap = require('imap'),
-  inspect = require('util').inspect
+const Imap = require('imap')
+const {inspect} = require('util')
+const {MailParser} = require('mailparser')
 
 // 初始化imap
 function MailReceiver (account) {
@@ -28,104 +29,100 @@ function MailReceiver (account) {
 MailReceiver.login = function (account, fn) {
   var receiver = new MailReceiver({username: account.username,password: account.password,host: account.host,port: account.port,ssl: account.ssl})
   receiver.imap.once('error', function (err) {
-    console.log(err)
+    if (err) {
+      throw err
+    }
     fn(err, receiver)
   })
   receiver.imap.once('ready', function () {
-    console.log('连接成功')
+    console.log('Connect successed!')
     fn(null, receiver)
   })
   receiver.imap.connect()
 }
 
-// 获取所有的miall的To,SUBJECT DATA
-MailReceiver.prototype.getAllMails = function (fn) {
+// 获取某个文件夹内的所有的miall的FROM,SUBJECT,DATA
+MailReceiver.prototype.getMailsHeader = function (boxname, fn) {
   var that = this
-  that.openInbox(function (err, box) {
+  var headers = []
+  that.openBox(boxname, (err, box) => {
     if (err) throw err
-    var f = that.imap.seq.fetch('1:2', {
-      markSeen: true,
-      size: true,
-      // bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'],
+    var f = that.imap.fetch(box.messages.total + ':*', {
+      bodies: ['HEADER.FIELDS (FROM SUBJECT DATE)'],
       struct: true
     })
-    f.on('message', function (msg, seqno) {
-      console.log('Message #%d', seqno)
-      var prefix = '(#' + seqno + ') '
-
-      msg.on('body', function (stream, info) {
-        console.log('----------------------------------------------')
-        console.dir(info)
-        console.log('----------------------------------------------')
-        var buffer = ''
-        stream.on('data', function (chunk) {
-          buffer += chunk.toString('utf8')
-        })
-        stream.once('end', function () {
-          console.log('end--------------------------------------' + info.which)
-          console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)))
-
-
-          // if (info.which === 'TEXT')
-          // 	fn(buffer)
-          // else
-          fn(Imap.parseHeader(buffer))
+    f.on('message', (msg, seqno) => {
+      var obj = {}
+      msg.on('body', (stream, info) => {
+        var mailparser = new MailParser()
+        stream.pipe(mailparser)
+        mailparser.on('headers', (header) => {
+          obj.header = header
         })
       })
-      msg.once('attributes', function (attrs) {
-        console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8))
+      msg.on('attributes', (attributes) => {
+        obj.attributes = attributes
       })
-      msg.once('end', function () {
-        console.log(prefix + 'Finished')
+      msg.on('end', () => {
+        headers.push(obj)
       })
     })
-    f.once('error', function (err) {
-      console.log('Fetch error: ' + err)
+    f.once('error', (err) => {
+      throw err
     })
-    f.once('end', function () {
+    f.once('end', () => {
+      fn(headers)
       console.log('Done fetching all messages!')
     // imap.end()
     })
   })
 }
 
-//	标记邮件为已读
-MailReceiver.prototype.markMailSeen = function (seqno) {
+// 更具uid得到邮件内容
+MailReceiver.prototype.getMail = function (uid, markSeen, fn) {
   var that = this
-  this.openInbox((err, box) => {
+  this.openBox('INBOX', (err, box) => {
     if (err) {
       throw err
     }
-    that.imap.seq.setFlags(seqno, ['Seen'], (err) => {
+    var f = that.imap.fetch([uid], {
+      markSeen: markSeen,
+      bodies: ''
+    })
+    f.on('message', (msg, seqno) => {
+      msg.on('body', (stream, info) => {
+        var mailparser = new MailParser()
+        stream.pipe(mailparser)
+        mailparser.on('end', (mail) => {
+          fn(mail)
+        })
+      })
+    })
+    f.once('error', (err) => {
+      throw err
+    })
+    f.once('end', () => {
+      console.log('Done fetching all messages!')
+    })
+  })
+}
+
+//	标记邮件为已读
+MailReceiver.prototype.markMailSeen = function (uid) {
+  var that = this
+  this.openBox('INBOX', (err, box) => {
+    if (err) {
+      throw err
+    }
+    that.imap.setFlags([uid], ['\\Seen'], (err) => {
       if (err) {
         throw err
       }
+      console.log(err)
     })
   })
 }
 
-// search
-MailReceiver.prototype.search = function (search) {
-  var that = this
-  that.openInbox((err, box) => {
-    if (err) throw err
-    that.imap.search([ 'NEW', ['ON', 'April 20, 2010']], function (err, results) {
-      console.log(results)
-      console.log(results.length)
-    })
-  })
-}
-
-//search
-MailReceiver.prototype.search=function(search){
-	var that=this;
-	that.openInbox((err, box) => {
-		if (err) throw err;
-		that.imap.search([ 'NEW',['ON', 'April 20, 2010']], function(err, results) {
-			console.log(results)
-			console.log(results.length)
-		})
-	});
 // 得到所有的文件夹
 MailReceiver.prototype.getAllBoxes = function (fn) {
   this.imap.getBoxes('', (err, boxes) => {
@@ -137,8 +134,8 @@ MailReceiver.prototype.getAllBoxes = function (fn) {
 }
 
 // login
-MailReceiver.prototype.openInbox = function (cb) {
-  this.imap.openBox('INBOX', true, cb)
+MailReceiver.prototype.openBox = function (boxname, cb) {
+  this.imap.openBox(boxname, true, cb)
 }
 
 module.exports = MailReceiver
