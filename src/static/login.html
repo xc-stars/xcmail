@@ -21,7 +21,10 @@
 			ipcRenderer.send('login',account);
 			ipcRenderer.once('login',function(event,err,user){
 				if(err)console.log('登录失败')
-					else console.log('登录成功')
+					else {
+						console.log('登录成功')
+						window.location.href="index.html"
+					}
 				console.log(err)
 				console.log(user)
 			});

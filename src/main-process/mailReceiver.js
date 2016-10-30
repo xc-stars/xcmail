@@ -27,7 +27,7 @@ function MailReceiver (account) {
 }
 // login
 MailReceiver.login = function (account, fn) {
-  var receiver = new MailReceiver({username: account.username,password: account.password,host: account.host,port: account.port,ssl: account.ssl})
+  var receiver = new MailReceiver({username: account.username, password: account.password, host: account.host, port: account.port, ssl: account.ssl})
   receiver.imap.once('error', function (err) {
     if (err) {
       throw err
@@ -51,6 +51,7 @@ MailReceiver.prototype.getMailsHeader = function (boxname, fn) {
       bodies: ['HEADER.FIELDS (FROM SUBJECT DATE)'],
       struct: true
     })
+
     f.on('message', (msg, seqno) => {
       var obj = {}
       msg.on('body', (stream, info) => {
