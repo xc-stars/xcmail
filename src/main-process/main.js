@@ -37,16 +37,6 @@ ipcMain.on('getAllEmails', (event, username) => {
   })
 })
 
-ipcMain.on('testMail', (event) => {
-  MailReceiver.login({username:'lovecodeq@foxmail.com',password:'jtnoxtpestzcbheb',host:'imap.qq.com',port:993,ssl:true},function(err,receiver){
-  // console.log(err,receiver)
-    receiver.getMail('85',false,function(txt){
-       event.sender.send('testMail', txt)
-    })
-  })
-
-  
-})
 
 app.on('ready', start)
 
