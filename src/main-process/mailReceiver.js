@@ -43,13 +43,24 @@ MailReceiver.login = function (account, fn) {
 }
 
 // 获取某个文件夹内的所有的miall的FROM,SUBJECT,DATA
-MailReceiver.prototype.getMailsHeader = function (boxname, fn) {
+MailReceiver.prototype.getMailsHeader = function (config, fn) {
+  config.start="1"
+  config.end="*"
+  this.getMailsHeaderPage(config,fn)
+}
+
+// 获取某个文件夹内的区间内的的miallc的FROM,SUBJECT,DATA
+MailReceiver.prototype.getMailsHeaderPage = function (config, fn) {
   var that = this
   var headers = []
-
+  var boxname=config.boxname;
+  var start=config.start||1;
+  var end=config.end||'*';
+  var durtion=start+":"+end;
+  console.log("durtion is ",durtion)
   that.openBox(boxname, (err, box) => {
     if (err) throw err
-    	 var f = that.imap.fetch('1:*', {
+       var f = that.imap.fetch(durtion, {
       bodies: ['HEADER.FIELDS (FROM SUBJECT DATE)'],
       struct: true
     })
@@ -57,16 +68,16 @@ MailReceiver.prototype.getMailsHeader = function (boxname, fn) {
       var obj = {}
       console.log(seqno)
       msg.on('body', (stream, info) => {
-    	
-				var buffer = '';
-				stream.on('data', function(chunk) {
-				  buffer += chunk.toString('utf8');
-				});
-				stream.once('end', function() {
-					var header=Imap.parseHeader(buffer)
-				  // console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
-				  obj.header = header
-				});
+      
+        var buffer = '';
+        stream.on('data', function(chunk) {
+          buffer += chunk.toString('utf8');
+        });
+        stream.once('end', function() {
+          var header=inspect(Imap.parseHeader(buffer))
+          // console.log('Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+          obj.header = header
+        });
       })
       msg.once('attributes', (attributes) => {
         obj.attributes = attributes
@@ -80,6 +91,7 @@ MailReceiver.prototype.getMailsHeader = function (boxname, fn) {
     })
     f.once('end', () => {
       fn(headers)
+      console.log('header is ',headers)
       console.log('Done fetching all messages!')
     // imap.end()
     })
@@ -140,6 +152,7 @@ MailReceiver.prototype.getAllBoxes = function (fn) {
     fn(boxes)
   })
 }
+
 
 // login
 MailReceiver.prototype.openBox = function (boxname, cb) {

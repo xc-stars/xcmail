@@ -37,9 +37,11 @@ ipcMain.on('login', (event, account) => {
  * @param  {[type]}
  * @return {[type]}
  */
-ipcMain.on('getAllEmails', (event, config) => {
-  receivers[utils.md5(username)].getAllMails((txt) => {
-    event.sender.send('getAllEmails', txt)
+ipcMain.on('getAllMails', (event, config) => {
+  var username =config.username;
+  var boxname=config.boxname;
+  receivers[utils.md5(username)].getMailsHeaderPage(config,function(res){
+   event.sender.send('getAllMails', res)
   })
 })
 
