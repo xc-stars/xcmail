@@ -56,7 +56,17 @@ function initListener(){
     ipcRenderer.once('getAllMails', function (event, res) {
       console.log(JSON.stringify(res))        
     })
-  } 
+  }
+
+  var getMailByUid38Dom=document.querySelector("#getMailByUid38");
+  getMailByUid38.onclick=function(e){
+    console.log('click getMailByUid38')
+    ipcRenderer.send('getMail',{username:e.currentTarget.dataset.username,uid:38})
+    ipcRenderer.once('getMail', function (event, res) {
+      console.log(JSON.stringify(res))        
+    })
+  }
+
 }
 
 

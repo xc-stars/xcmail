@@ -114,6 +114,7 @@ MailReceiver.prototype.getMail = function (uid, markSeen, fn) {
         var mailparser = new MailParser()
         stream.pipe(mailparser)
         mailparser.on('end', (mail) => {
+          console.log('mail is ',mail)
           fn(mail)
         })
       })

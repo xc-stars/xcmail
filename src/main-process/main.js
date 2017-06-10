@@ -44,6 +44,36 @@ ipcMain.on('getAllMails', (event, config) => {
    event.sender.send('getAllMails', res)
   })
 })
+/**
+ * 获取所有的邮件，传入一个box的名称和一个用户名
+ * @param  {[type]}
+ * @param  {[type]}
+ * @return {[type]}
+ */
+ipcMain.on('getAllMails', (event, config) => {
+  var username =config.username;
+  var boxname=config.boxname;
+  receivers[utils.md5(username)].getMailsHeaderPage(config,function(res){
+   event.sender.send('getAllMails', res)
+  })
+})
+/**
+ * 根据邮件的uid获取一个邮件
+ * @param  {[type]}
+ * @return {[type]}
+ */
+ipcMain.on('getMail', (event, config) => {
+  var username =config.username;
+  var uid=config.uid;
+  //是否变成已读
+  var markSeen=false;
+  console.log(config)
+  receivers[utils.md5(username)].getMail(uid,markSeen,function(res){
+   event.sender.send('getMail', res)
+  })
+})
+
+
 
 /**
  * 获取所有的文件夹
