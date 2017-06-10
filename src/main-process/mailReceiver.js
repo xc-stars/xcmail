@@ -27,6 +27,7 @@ function MailReceiver (account) {
 }
 // login
 MailReceiver.login = function (account, fn) {
+  console.log(account)
   var receiver = new MailReceiver({username: account.username, password: account.password, host: account.host, port: account.port, ssl: account.ssl})
   receiver.imap.once('error', function (err) {
     if (err) {

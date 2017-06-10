@@ -31,9 +31,27 @@ ipcMain.on('login', (event, account) => {
     }
   })
 })
-ipcMain.on('getAllEmails', (event, username) => {
+/**
+ * 获取所有的邮件，传入一个box的名称和一个用户名
+ * @param  {[type]}
+ * @param  {[type]}
+ * @return {[type]}
+ */
+ipcMain.on('getAllEmails', (event, config) => {
   receivers[utils.md5(username)].getAllMails((txt) => {
     event.sender.send('getAllEmails', txt)
+  })
+})
+
+/**
+ * 获取所有的文件夹
+ * @param  {[type]}
+ * @param  {[type]}
+ * @return {[type]}
+ */
+ipcMain.on('getAllBoxs', (event, username) => {
+  receivers[utils.md5(username)].getAllBoxes((boxs) => {
+    event.sender.send('getAllBoxs', boxs)
   })
 })
 

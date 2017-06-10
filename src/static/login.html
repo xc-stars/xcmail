@@ -15,16 +15,18 @@
 			var account={
 				username:document.querySelector('#username').value,
 				password:document.querySelector('#password').value,
-				host:'imap.qq.com'
+				host:'imap.qq.com',
+				port:993,
+				ssl:true
 			}
 
 			ipcRenderer.send('login',account);
 			ipcRenderer.once('login',function(event,err,user){
 				if(err)console.log('登录失败')
-					else {
-						console.log('登录成功')
-						window.location.href="index.html"
-					}
+				else {
+					console.log('登录成功')
+					window.location.href="index.html"
+				}
 				console.log(err)
 				console.log(user)
 			});
