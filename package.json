@@ -4,7 +4,7 @@
   "description": "",
   "main": "src\\main-process\\main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron src/main-process/main.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +16,6 @@
     "promise": "^7.1.1"
   },
   "devDependencies": {
-    "electron": "^1.4.4",
     "gulp": "^3.9.1",
     "gulp-less": "^3.1.0",
     "standard": "*"
